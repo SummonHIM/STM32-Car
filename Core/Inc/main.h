@@ -59,6 +59,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_PC13_Pin GPIO_PIN_13
 #define LED_PC13_GPIO_Port GPIOC
+#define KEY1_Pin GPIO_PIN_7
+#define KEY1_GPIO_Port GPIOA
+#define KEY1_EXTI_IRQn EXTI9_5_IRQn
 #define BIN2_Pin GPIO_PIN_0
 #define BIN2_GPIO_Port GPIOB
 #define BIN1_Pin GPIO_PIN_1
@@ -67,6 +70,17 @@ void Error_Handler(void);
 #define AIN2_GPIO_Port GPIOB
 #define AIN1_Pin GPIO_PIN_13
 #define AIN1_GPIO_Port GPIOB
+#define KEY2_Pin GPIO_PIN_12
+#define KEY2_GPIO_Port GPIOA
+#define KEY2_EXTI_IRQn EXTI15_10_IRQn
+#define OUT_4_Pin GPIO_PIN_15
+#define OUT_4_GPIO_Port GPIOA
+#define OUT_3_Pin GPIO_PIN_3
+#define OUT_3_GPIO_Port GPIOB
+#define OUT_2_Pin GPIO_PIN_4
+#define OUT_2_GPIO_Port GPIOB
+#define OUT_1_Pin GPIO_PIN_5
+#define OUT_1_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

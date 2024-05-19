@@ -1,4 +1,4 @@
-#include "stm32f1xx_hal.h"
+#include <stdint.h>
 
 /* 旋转舵机角度*/
 void Car_CH34G_TurnAngle(uint32_t angle);

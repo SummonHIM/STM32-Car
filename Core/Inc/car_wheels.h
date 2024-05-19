@@ -1,4 +1,4 @@
-#include "stm32f1xx_hal.h"
+#include "main.h"
 
 // 左轮
 #define AIN1_H HAL_GPIO_WritePin(AIN1_GPIO_Port, AIN1_Pin, GPIO_PIN_SET)

@@ -63,12 +63,43 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_PC13_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = KEY1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(KEY1_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
   GPIO_InitStruct.Pin = BIN2_Pin|BIN1_Pin|AIN2_Pin|AIN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = KEY2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(KEY2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = OUT_4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(OUT_4_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin PBPin */
+  GPIO_InitStruct.Pin = OUT_3_Pin|OUT_2_Pin|OUT_1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
