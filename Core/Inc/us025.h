@@ -1,1 +1,1 @@
-void US025_Startup(void);
+void US025_Start(void);

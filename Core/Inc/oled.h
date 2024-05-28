@@ -16,6 +16,7 @@ void oled_show_string(uint8_t line, uint8_t *chr);
 void oled_init(void);
 void oled_clear(void);
 void oled_show_CH_char(uint8_t x, uint8_t y, uint8_t chr);
+void OLED_Disp_CarInfo(float CCM, uint8_t Mode);
 //
 typedef enum {
   OLED_DSP_LINE0 = 0,

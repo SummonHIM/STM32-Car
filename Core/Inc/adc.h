@@ -35,7 +35,7 @@ extern "C" {
 extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
-float CAR_GetADCVoltage();
+float ADC_GetVoltage();
 /* USER CODE END Private defines */
 
 void MX_ADC1_Init(void);

@@ -25,14 +25,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
+#include <string.h>
 #include "car_wheels.h"
 #include "ch34g.h"
 #include "ir.h"
 #include "oled.h"
-#include "usart_ctrl.h"
+#include "sr04.h"
 #include "us025.h"
-
+#include "utils.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,10 +53,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t IRBT_Switch = 0;
-char strADCVoltage[20] = {0};
-char strSR04Dist[20] = {0};
+uint8_t ModeSwitch = 0;
 float CCM;
+
+uint8_t p;
+uint8_t data;
+uint8_t Rx_Stat;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,6 +69,33 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void USART_WheelsControl(UART_HandleTypeDef *huart) {
+  HAL_UART_Receive_IT(huart, &p, 1);
+
+  switch (Rx_Stat) {
+  case 1:
+    CAR_Forward();
+    memset(&data, 0, 1);
+    break;
+  case 2:
+    CAR_Backward();
+    memset(&data, 0, 1);
+    break;
+  case 3:
+    Car_Leftward();
+    memset(&data, 0, 1);
+    break;
+  case 4:
+    CAR_Rightward();
+    memset(&data, 0, 1);
+    break;
+  case 0:
+    Car_Stop();
+    memset(&data, 0, 1);
+    break;
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -106,7 +135,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  Car_CH34G_Init();
+  CH34G_Init();
   oled_init();
   HAL_ADCEx_Calibration_Start(&hadc1);
   HAL_ADC_Start(&hadc1);
@@ -115,19 +144,24 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    US025_Startup();
+    US025_Start();
+    OLED_Disp_CarInfo(CCM, ModeSwitch);
 
-    sprintf(strADCVoltage, "Voltage: %.2fv", CAR_GetADCVoltage());
-    sprintf(strSR04Dist, "Dist: %.2fcm", ((CCM * 340) / 1000000.0) / 2 * 100.0);
-    oled_show_string(1, (uint8_t *)strADCVoltage);
-    oled_show_string(3, (uint8_t *)strSR04Dist);
-
-    switch (IRBT_Switch) {
-    case 0:
-      CAR_IR();
-      break;
+    switch (ModeSwitch) {
     case 1:
-      Car_WheelsControl(&huart3);
+      SR04_WheelsControl(CCM);
+      break;
+    case 2:
+      USART_WheelsControl(&huart3);
+      break;
+    case 3:
+      IR_Processing();
+      break;
+    case 4:
+      SR04_FullWheelsControl(CCM);
+      break;
+    default:
+      Car_Stop();
       break;
     }
 
@@ -188,12 +222,15 @@ void SystemClock_Config(void)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == KEY1_Pin) {
-    HAL_GPIO_WritePin(LED_PC13_GPIO_Port, LED_PC13_Pin, GPIO_PIN_RESET);
-    IRBT_Switch = 0;
+    Delay_MS(10);
+    if (GPIO_Pin == KEY1_Pin) {
+      ModeSwitch += 1;
+      if (ModeSwitch > 4)
+        ModeSwitch = 1;
+    }
   }
   if (GPIO_Pin == KEY2_Pin) {
-    HAL_GPIO_WritePin(LED_PC13_GPIO_Port, LED_PC13_Pin, GPIO_PIN_SET);
-    IRBT_Switch = 1;
+    ModeSwitch = 0;
   }
 
   if (HAL_GPIO_ReadPin(SR04_ECHO_GPIO_Port, SR04_ECHO_Pin) == 1) {
@@ -204,6 +241,29 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (HAL_GPIO_ReadPin(SR04_ECHO_GPIO_Port, SR04_ECHO_Pin) == 0) {
     CCM = __HAL_TIM_GetCounter(&htim2);
     HAL_TIM_Base_Stop(&htim2);
+  }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart3) {
+    data = p;
+    switch (data) {
+    case 'W':
+      Rx_Stat = 1;
+      break;
+    case 'S':
+      Rx_Stat = 2;
+      break;
+    case 'A':
+      Rx_Stat = 3;
+      break;
+    case 'D':
+      Rx_Stat = 4;
+      break;
+    case 'Q':
+      Rx_Stat = 0;
+      break;
+    }
   }
 }
 /* USER CODE END 4 */

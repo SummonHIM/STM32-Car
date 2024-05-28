@@ -1,5 +1,8 @@
+#include <stdio.h>
 #include "oled.h"
+#include "adc.h"
 #include "font.h"
+#include "sr04.h"
 
 //
 void oled_write_command(uint8_t command) // OLED–¥√¸¡Ó
@@ -252,3 +255,16 @@ void oled_init(void) // OLED≥ı ºªØ
 
 //    HAL_Delay(100);
 //}
+
+void OLED_Disp_CarInfo(float CCM, uint8_t Mode) {
+  char strADCVoltage[20] = {0};
+  char strSR04Dist[20] = {0};
+  char strMode[20] = {0};
+
+  sprintf(strADCVoltage, "V: %.2fv", ADC_GetVoltage());
+  sprintf(strSR04Dist, "Dist: %.2fcm", SR04_Dist(CCM));
+  sprintf(strMode, "Mode: %d", Mode);
+  oled_show_string(1, (uint8_t *)strADCVoltage);
+  oled_show_string(3, (uint8_t *)strSR04Dist);
+  oled_show_string(5, (uint8_t *)strMode);
+}
