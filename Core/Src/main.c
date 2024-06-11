@@ -53,12 +53,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t ModeSwitch = 0;
+uint16_t ModeSwitch = 0;
 float CCM;
 
 uint8_t p;
 uint8_t data;
 uint8_t Rx_Stat;
+
+uint16_t frontOBS = 0;
+uint16_t leftObs = 0;
+uint16_t rightObs = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -158,7 +162,24 @@ int main(void)
       IR_Processing();
       break;
     case 4:
-      SR04_FullWheelsControl(CCM);
+      CH34G_TurnAngle(50, 400);
+      if (SR04_Dist(CCM) < 25)
+        leftObs = 1;
+
+      CH34G_TurnAngle(80, 400);
+      if (SR04_Dist(CCM) < 25)
+        frontOBS = 1;
+
+      CH34G_TurnAngle(110, 400);
+      if (SR04_Dist(CCM) < 25)
+        rightObs = 1;
+
+      SR04_LRControl(frontOBS, leftObs, rightObs);
+
+      frontOBS = 0;
+      leftObs = 0;
+      rightObs = 0;
+      CH34G_TurnAngle(80, 200);
       break;
     default:
       Car_Stop();
@@ -221,15 +242,13 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-  if (GPIO_Pin == KEY1_Pin) {
-    Delay_MS(10);
-    if (GPIO_Pin == KEY1_Pin) {
+  if (GPIO_Pin == KEY2_Pin) {
       ModeSwitch += 1;
       if (ModeSwitch > 4)
         ModeSwitch = 1;
-    }
   }
-  if (GPIO_Pin == KEY2_Pin) {
+
+  if (GPIO_Pin == KEY1_Pin) {
     ModeSwitch = 0;
   }
 
