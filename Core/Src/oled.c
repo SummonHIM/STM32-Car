@@ -257,14 +257,19 @@ void oled_init(void) // OLED≥ı ºªØ
 //}
 
 void OLED_Disp_CarInfo(float CCM, uint8_t Mode) {
-  char strADCVoltage[20] = {0};
-  char strSR04Dist[20] = {0};
+  char strLine1[20] = {0};
+  // char strLine2[20] = {0};
   char strMode[20] = {0};
 
-  sprintf(strADCVoltage, "V: %.2fv", ADC_GetVoltage());
-  sprintf(strSR04Dist, "Dist: %.2fcm", SR04_Dist(CCM));
+  sprintf(strLine1, "V: %.2fv D: %.2fcm", ADC_GetVoltage(), SR04_Dist(CCM));
   sprintf(strMode, "Mode: %d", Mode);
-  oled_show_string(1, (uint8_t *)strADCVoltage);
-  oled_show_string(3, (uint8_t *)strSR04Dist);
+  oled_show_string(1, (uint8_t *)strLine1);
+  // oled_show_string(3, (uint8_t *)strLine2);
+  oled_show_CH_char(2, 3, 0);
+  oled_show_CH_char(18, 3, 1);
+  oled_show_CH_char(34, 3, 2);
+  oled_show_CH_char(58, 3, 3);
+  oled_show_CH_char(74, 3, 4);
+  oled_show_CH_char(90, 3, 5);
   oled_show_string(5, (uint8_t *)strMode);
 }

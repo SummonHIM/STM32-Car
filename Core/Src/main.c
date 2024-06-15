@@ -33,6 +33,7 @@
 #include "sr04.h"
 #include "us025.h"
 #include "utils.h"
+// #include "dht11.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,15 +55,12 @@
 
 /* USER CODE BEGIN PV */
 uint16_t ModeSwitch = 0;
+
 float CCM;
 
 uint8_t p;
 uint8_t data;
 uint8_t Rx_Stat;
-
-uint16_t frontOBS = 0;
-uint16_t leftObs = 0;
-uint16_t rightObs = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -134,7 +132,6 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_TIM3_Init();
-  MX_USART1_UART_Init();
   MX_USART3_UART_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
@@ -162,24 +159,29 @@ int main(void)
       IR_Processing();
       break;
     case 4:
-      CH34G_TurnAngle(50, 400);
-      if (SR04_Dist(CCM) < 25)
-        leftObs = 1;
-
-      CH34G_TurnAngle(80, 400);
-      if (SR04_Dist(CCM) < 25)
-        frontOBS = 1;
-
-      CH34G_TurnAngle(110, 400);
-      if (SR04_Dist(CCM) < 25)
-        rightObs = 1;
-
-      SR04_LRControl(frontOBS, leftObs, rightObs);
-
-      frontOBS = 0;
-      leftObs = 0;
-      rightObs = 0;
       CH34G_TurnAngle(80, 200);
+      if (SR04_Dist(CCM) > 35) {
+        CAR_Forward();
+        HAL_Delay(100);
+      }
+      if (SR04_Dist(CCM) < 35) {
+        CH34G_TurnAngle(50, 200);
+        if (SR04_Dist(CCM) > 35) {
+          CAR_Rightward();
+          HAL_Delay(300);
+        } else {
+          CH34G_TurnAngle(110, 200);
+          if (SR04_Dist(CCM) > 25) {
+            Car_Leftward();
+            HAL_Delay(300);
+          } else {
+            CAR_Backward();
+            HAL_Delay(300);
+            Car_Leftward();
+            HAL_Delay(300);
+          }
+        }
+      }
       break;
     default:
       Car_Stop();
